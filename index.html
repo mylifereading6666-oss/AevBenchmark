@@ -15,7 +15,28 @@ main{max-width:1240px;margin:auto;padding:22px 16px 55px}.layout{display:grid;gr
 .section{margin-top:22px}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.test{position:relative;overflow:hidden}.test:before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink))}.test .value{font-size:23px;font-weight:900;color:var(--green);margin:10px 0}.test p{font-size:12px;color:var(--muted);min-height:45px}.test button{width:100%}.side{display:grid;gap:12px;align-content:start}.kv{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:8px 0;font-size:12px}.kv span:first-child{color:var(--muted)}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--line);border-radius:20px;padding:4px 8px;font-size:10px;color:var(--muted)}
 canvas{width:100%;height:190px;border:1px solid var(--line);border-radius:10px;background:#050914}table{width:100%;border-collapse:collapse;min-width:500px}td,th{padding:9px 10px;border-bottom:1px solid var(--line);font-size:12px;text-align:left}th{color:var(--muted)}.scroll{overflow:auto}.alert{border:1px solid #765c2d;background:#2b2111;color:#ffdc9b;border-radius:10px;padding:11px;font-size:11px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;font-size:12px}.formrow input{width:100px}.formrow select{max-width:160px}footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
 @media(max-width:950px){.layout{grid-template-columns:1fr}.side{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){header{padding:10px}.cards,.side,.two{grid-template-columns:1fr}.hero{display:block}.scorepanel{margin-top:14px}.panel{padding:14px}.toolbar button{flex:1}}
+@media(max-width:560px){
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+header{padding:9px 10px;gap:6px;align-items:center}
+.brand{font-size:16px;letter-spacing:.3px}.subtitle{font-size:8px;letter-spacing:1px}
+header .toolbar{gap:5px}header button{padding:7px 8px;font-size:11px}
+main{width:100%;max-width:100%;padding:12px 10px 35px}
+.layout{display:flex;flex-direction:column;gap:12px}
+.cards,.side,.two{grid-template-columns:minmax(0,1fr);gap:10px}
+.hero{display:flex;flex-direction:column;align-items:stretch;gap:12px}
+h1{font-size:clamp(27px,8vw,38px);overflow-wrap:anywhere}
+.scorepanel{margin-top:0;min-width:0;width:100%;padding:12px}
+.score{font-size:42px}
+.panel{padding:12px;border-radius:12px;min-width:0}
+.toolbar{gap:6px}.toolbar button{flex:1;min-width:0;padding:10px 8px;font-size:12px}
+.test p{min-height:0}.test .value{font-size:21px}
+.formrow{align-items:flex-start;flex-direction:column;gap:5px}.formrow input,.formrow select{width:100%;max-width:none}
+canvas{height:150px}
+.scroll{max-width:100%;overflow-x:auto}table{min-width:560px}
+.section{margin-top:15px}.sectionhead{align-items:flex-start;flex-wrap:wrap}
+.alert{overflow-wrap:anywhere}
+footer{padding:20px 10px}
+}
 </style>
 </head>
 <body>
