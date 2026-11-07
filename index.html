@@ -37,10 +37,30 @@ canvas{height:150px}
 .alert{overflow-wrap:anywhere}
 footer{padding:20px 10px}
 }
+/* Device-aware responsive profiles */
+body[data-device="phone"] .device-profile{color:var(--green)}
+body[data-device="tablet"] .device-profile{color:var(--cyan)}
+body[data-device="desktop"] .device-profile{color:var(--violet)}
+@media(min-width:561px) and (max-width:950px){
+ body[data-device="tablet"] main{max-width:100%;padding:20px}
+ body[data-device="tablet"] .layout{grid-template-columns:minmax(0,1fr)}
+ body[data-device="tablet"] .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body[data-device="tablet"] .side{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+ body[data-device="phone"] main{padding:12px 10px 35px}
+ body[data-device="phone"] .layout{display:flex;flex-direction:column}
+ body[data-device="phone"] .cards,body[data-device="phone"] .side,body[data-device="phone"] .two{grid-template-columns:minmax(0,1fr)}
+ body[data-device="phone"] .hero{display:flex;flex-direction:column;align-items:stretch}
+ body[data-device="phone"] .scorepanel{width:100%;min-width:0;margin-top:0}
+ body[data-device="phone"] .panel{padding:12px;min-width:0}
+ body[data-device="phone"] .formrow{align-items:flex-start;flex-direction:column}
+ body[data-device="phone"] .formrow input,body[data-device="phone"] .formrow select{width:100%;max-width:none}
+}
 </style>
 </head>
 <body>
-<header><div><div class="brand">AEV<b>BENCHMARK</b> <span style="font-size:10px;color:var(--pink)">PRO</span></div><div class="subtitle">ADVANCED DEVICE PERFORMANCE LAB</div></div><div class="toolbar" style="margin:0"><button id="language">EN / JP</button><button id="theme">THEME</button></div></header>
+<header><div><div class="brand">AEV<b>BENCHMARK</b> <span style="font-size:10px;color:var(--pink)">PRO</span></div><div class="subtitle">ADVANCED DEVICE PERFORMANCE LAB</div><div class="subtitle device-profile" id="deviceProfile">端末判定中…</div></div><div class="toolbar" style="margin:0"><button id="language">EN / JP</button><button id="theme">THEME</button></div></header>
 <main>
 <div class="layout"><div>
 <section class="panel hero"><div><div class="eyebrow">PRO PERFORMANCE SUITE / v2.1</div><h1>BENCHMARK<br><span>WITHOUT LIMITS.</span></h1><div class="muted" data-ja="CPU・描画・メモリ・DOM・ストレージ・Web APIをブラウザ内で多角的に計測。" data-en="Multi-dimensional browser-side CPU, graphics, memory, DOM, storage and Web API tests.">CPU・描画・メモリ・DOM・ストレージ・Web APIをブラウザ内で多角的に計測。</div><div class="toolbar"><button class="primary" id="runAll">▶ PRO SUITEを実行</button><button id="stop" class="danger">停止</button><button id="quick">クイック測定</button></div><div class="bar"><i id="progress"></i></div><small class="muted" id="status">Ready / 待機中</small></div><div class="scorepanel panel"><div class="eyebrow">AEV PRO INDEX</div><div class="score" id="score">—<small>総合スコア / Composite</small></div><div id="rank">NOT TESTED</div><div class="small muted">独自指標・参考値</div></div></section>
@@ -90,6 +110,37 @@ $("language").onclick=()=>{lang=lang==="ja"?"en":"ja";document.documentElement.l
 $("theme").onclick=()=>document.body.style.filter=document.body.style.filter?"":"hue-rotate(25deg)"
 let anim=false,raf,frames=0,last=performance.now(),c=$("canvas"),ctx=c.getContext("2d");function draw(){if(!anim)return;let w=c.clientWidth,h=c.clientHeight,d=devicePixelRatio;c.width=w*d;c.height=h*d;ctx.setTransform(d,0,0,d,0,0);ctx.fillStyle="#050914";ctx.fillRect(0,0,w,h);for(let i=0;i<130;i++){let x=(i*29+performance.now()*.04)%w,y=(i*47+Math.sin(i+performance.now()/400)*24)%h;ctx.fillStyle="hsl("+((i*3+performance.now()/15)%360)+" 95% 60%)";ctx.fillRect(x,y,2+i%4,2+i%4)}frames++;if(performance.now()-last>1000){$("livefps").textContent=frames+" FPS";frames=0;last=performance.now()}raf=requestAnimationFrame(draw)}
 $("preview").onclick=()=>{anim=!anim;$("preview").textContent=anim?"STOP":"START";if(anim)draw();else cancelAnimationFrame(raf)}
+
+// Detect a suitable layout from several browser signals, not user-agent alone.
+function detectDevice(){
+ const w=Math.min(window.innerWidth||screen.width,screen.width||window.innerWidth);
+ const h=Math.min(window.innerHeight||screen.height,screen.height||window.innerHeight);
+ const ua=navigator.userAgent||"";
+ const uaMobile=/Android.*Mobile|iPhone|iPod|Windows Phone|Mobile/i.test(ua);
+ const uaTablet=/iPad|Tablet|Android(?!.*Mobile)/i.test(ua);
+ const coarse=window.matchMedia("(pointer: coarse)").matches;
+ const fine=window.matchMedia("(pointer: fine)").matches;
+ const touch=navigator.maxTouchPoints>1;
+ let type;
+ // Compact viewport + mobile signals strongly indicates a phone.
+ if(w<=600 && (uaMobile||coarse||touch)) type="phone";
+ // Tablet-sized viewport with touch input, or tablet UA.
+ else if((uaTablet||((w<=1100)&&coarse&&touch)) && w>600) type="tablet";
+ // A narrow window on desktop is still responsive, but classify by actual viewport.
+ else if(w<=600) type="phone";
+ else if(w<=1024 && (coarse||touch)) type="tablet";
+ else type="desktop";
+ document.body.dataset.device=type;
+ document.body.dataset.input=coarse?"touch":fine?"mouse":"mixed";
+ const label={phone:"スマートフォン向け表示",tablet:"タブレット向け表示",desktop:"PC向け表示"}[type];
+ const orientation=w>h?"横向き":"縦向き";
+ $("deviceProfile").textContent=label+" · "+orientation+" · "+w+"×"+h;
+ $("deviceProfile").title="判定: "+type+" / input: "+document.body.dataset.input+" / UA: "+(uaTablet?"tablet":uaMobile?"mobile":"other");
+}
+detectDevice();
+window.addEventListener("resize",detectDevice,{passive:true});
+window.addEventListener("orientationchange",()=>setTimeout(detectDevice,150),{passive:true});
+if(window.matchMedia){for(const q of ["(pointer: coarse)","(pointer: fine)"]){const m=matchMedia(q);m.addEventListener?.("change",detectDevice)}}
 inspect();renderHistory();
 </script>
 </body></html>
